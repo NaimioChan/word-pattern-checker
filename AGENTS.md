@@ -10,7 +10,7 @@ word-pattern-checker：给 agent 填词时校验词格的 CLI。词格 = 字数 
 
 - Python 3，只用标准库。不引入第三方包，不建 venv 以外的依赖清单。
 - CLI 入口：`python wpc.py check --spec spec.txt --draft draft.txt --json`
-- 测试：`python -m pytest tests/`（M1 起存在；无 pytest 时 `python -m unittest discover tests`）
+- 测试：`python -m unittest discover -s tests -t .`（纯标准库 unittest，无需 pytest）
 
 ## 铁律
 

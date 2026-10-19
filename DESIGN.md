@@ -76,7 +76,7 @@ digits: each
 - 第一行必须是 `# spec: <文件名> sha256=<64 位 hex>`，缺失即 exit 2。
 - 版本头 `## <标签>`，标签与之后内容到下一个版本头为止。日期是可选的附加 token，解析时忽略标签后的其余内容。
 - 段标记 `[<段名>]` 单独一行，与 spec 的段名对齐。缺段、多段都算解析错。
-- 句行 `<句号> | <文本>`。文本里的空格仅作排版，校验时折叠。
+- 句行 `<句号> | <文本>`。文本里的空格不占格；拉丁语种靠空格分界，所以不能整段删掉空白，只能忽略。
 - `|` 是分句分隔符，全角 `｜` 等价。
 - 某句可缺省（尚未填写），算 `too_few`；句号在 spec 中不存在算 exit 2。
 - `--version` 不指定时取文件中最靠后的版本头。
@@ -127,7 +127,7 @@ digits: each
 ```
 function syllables(word):
     w = lower(word)，去掉首尾非字母
-    if w in EXCEPTIONS: return EXCEPTIONS[w]     # 高频词表，约 200 条
+    if w in EXCEPTIONS: return EXCEPTIONS[w]     # 高频词表，值为切分，如 "ev|ery"
     n = 0
     for 每个元音序列 (a e i o u y):
         n += 1
@@ -143,7 +143,9 @@ function syllables(word):
     return max(1, n)
 ```
 
-`EXCEPTIONS` 至少覆盖：one two three four eight nine eleven twelve, every evening business family beautiful, fire hour our flower power, science quiet poem cruel, people little, i a the, 以及 -tion/-sion 结尾词。每个词一经发现切错，就补进表里，表本身是可提交的数据文件（`word_exceptions.py` 或内嵌 dict）。
+`EXCEPTIONS` 至少覆盖：one two three four eight nine eleven twelve, every evening business family beautiful, fire hour our flower power, science quiet poem cruel, people little, i a the, 以及 -tion/-sion 结尾词。每个词一经发现切错，就补进表里，表本身是可提交的数据（实现上内嵌在 `wpc.py` 里）。
+
+表的值是**切分**而不是计数（`"ev|ery"`），计数 = 切分段数。这样 `cells` 数组长度恒等于 `actual`，agent 拿到的逐格定位不会和计数打架。
 
 `syllable` 模式下每句返回 `estimated: true`。需要精确时用户可在文本里写连字符手工钉死，checker 不再猜。
 
@@ -165,7 +167,7 @@ python wpc.py list --draft draft.txt                 # 列出所有版本标签
 python wpc.py hash --spec spec.txt                   # 算 sha256，供写 draft 头
 ```
 
-- `check` 默认只查最后一版；`--version` 指定标签；`--version all` 查全部并按版本分别输出。
+- `check` 默认只查最后一版；`--version` 指定标签；`--version all` 查全部并按版本分别输出（`--json` 时顶层为 `{"ok", "spec", "versions": [{"version", "ok", "violations", "warnings", "summary"}]}`）。
 - `--json` 输出单个 JSON 对象到 stdout，其余一切走 stderr。schema 见下。
 - `--explain` 输出人读的分句表，逐格对齐，便于肉眼比对分句断点。
 

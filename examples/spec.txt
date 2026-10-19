@@ -1,0 +1,17 @@
+# 示例词格：一段主歌 + 一段副歌，中英日韩混排
+lang: mixed
+latin: syllable
+punct: ignore
+digits: each
+
+## verse
+1 | 2/2/2
+2 | 2/2/2
+3 | 4/4
+4 | 3/3/3
+
+## chorus
+1 | 2/3
+2 | 3/4
+3 | 3/4
+4 | 5
